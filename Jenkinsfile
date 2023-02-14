@@ -1,12 +1,11 @@
 pipeline{
-    agent any
+    agent {
+        docker {
+            image 'maven'
+        }
+    }
     stages{
         stage('clone'){
-            agent {
-                docker {
-                    image 'maven'
-                }
-            }
             steps{
                 sh 'mvn --version'
             }

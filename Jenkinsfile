@@ -2,8 +2,8 @@ pipeline{
   agent any
   stages{
     stage('clone'){
-      agent{
-        docker{
+      agent {
+        docker {
           image 'maven'
         }
       }

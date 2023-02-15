@@ -18,6 +18,15 @@ pipeline{
             environment{
                 script_options = "--clean 50"
             }
+            
+            input {
+                message "Should we continue?"
+                ok "Yes, we should."
+                submitter "alice,bob"
+                parameters {
+                    string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+                }
+            }
             steps{
                 sh 'mvn --version'
                 sh 'printenv'
@@ -26,14 +35,6 @@ pipeline{
         }
 
         stage('build'){
-            agent {
-                docker {
-                    image 'node'
-                }
-            }
-            options{
-                timeout(time: 1, unit: 'MINUTES')
-            }
             steps{
                 sh 'node --version'
                 sh 'printenv'
@@ -53,8 +54,22 @@ pipeline{
                 sh 'docker login -u $Docker_cred_USR -p $Docker_cred_PSW'
             }
         }
-    }
 
+        stage('Parallel'){
+            parallel{
+                stage('docker build'){
+                    steps{
+                        sh 'echo docker build'
+                    }
+                }
+                stage('docker build'){
+                    steps{
+                        sh 'echo docker build'
+                    }
+                }
+        
+            }
+        }
     post{
         always{
             cleanWs()

@@ -1,31 +1,22 @@
 pipeline{
     agent any
     environment{
-        script_options = "--clean 30"
+        script_options = '--clean30'
         Docker_cred = credentials('docker-cred')
     }
     options{
-        buildDiscarder(logRotator(numToKeepStr: '5'))
-        timestamps()
+       buildDiscarder(logRotator(numToKeepStr: '5'))
+        timestamps() 
     }
     stages{
         stage('clone'){
             agent {
                 docker {
                     image 'maven'
-              }
+                }
             }
             environment{
-                script_options = "--clean 50"
-            }
-            
-            input {
-                message "Should we continue?"
-                ok "Yes, we should."
-                submitter "alice,bob"
-                parameters {
-                    string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
-                }
+                script_options = '--clean 50'
             }
             steps{
                 sh 'mvn --version'
@@ -36,7 +27,7 @@ pipeline{
 
         stage('build'){
             steps{
-                sh 'node --version'
+                sh 'echo node version'
                 sh 'printenv'
             }
             post{
@@ -44,7 +35,7 @@ pipeline{
                     sh 'echo build completed'
                 }
                 aborted{
-                    sh 'Stage aborted'
+                    sh 'echo build aborted'
                 }
             }
         }
@@ -56,20 +47,21 @@ pipeline{
         }
 
         stage('Parallel'){
-            parallel{
+            parallel {
                 stage('docker build'){
                     steps{
                         sh 'echo docker build'
                     }
                 }
-                stage('docker build'){
+                stage('docker push'){
                     steps{
-                        sh 'echo docker build'
+                        sh 'echo docker push'
                     }
                 }
         
             }
         }
+    }
     post{
         always{
             cleanWs()
